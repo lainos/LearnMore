@@ -7,8 +7,10 @@
     tools:context="learnmore.yzx.com.learnmore.MainActivity">
 
     <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="368dp"
+        android:layout_height="495dp"
+        tools:layout_editor_absoluteX="8dp"
+        tools:layout_editor_absoluteY="8dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -28,12 +30,23 @@
                 android:id="@+id/tvContent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/btnClick"
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="8dp"
                 android:text="TextView"
                 android:textSize="12sp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/btnAnnotation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toEndOf="@+id/btnClick"
+                android:text="注解执行"
+                android:textAllCaps="false" />
+
         </RelativeLayout>
     </ScrollView>
 </android.support.constraint.ConstraintLayout>

@@ -14,6 +14,8 @@ import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowApplication;
 import org.robolectric.shadows.ShadowBitmap;
 
+import java.io.IOException;
+
 import static org.junit.Assert.*;
 
 /**
@@ -41,4 +43,5 @@ public class MainActivityTest {
         assertNotNull(shadowBitmap);
 
     }
+
 }

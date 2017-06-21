@@ -31,4 +31,6 @@ dependencies {
     testCompile "org.robolectric:robolectric:3.0"
     testCompile "org.robolectric:shadows-support-v4:3.0"
     compile 'org.robolectric:robolectric-annotations:3.0'
+
+    compile 'com.afollestad.material-dialogs:core:0.9.4.5'
 }

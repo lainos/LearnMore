@@ -8,18 +8,24 @@ import android.os.Message;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.lang.annotation.Annotation;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.HashMap;
+
+import learnmore.yzx.com.learnmore.fruitannotation.Apple;
+import learnmore.yzx.com.learnmore.fruitannotation.FruitColor;
+import learnmore.yzx.com.learnmore.fruitannotation.FruitName;
+import learnmore.yzx.com.learnmore.simpleannotation.TestA;
+import learnmore.yzx.com.learnmore.simpleannotation.UserAnnotation;
 
 /**
  *
@@ -37,29 +43,92 @@ public class MainActivity extends AppCompatActivity {
         init1Option();
         init2Option();
 
-//        TelephonyManager tm = (TelephonyManager) this.getSystemService(TELEPHONY_SERVICE);
-//        Log.i("weloop", "deviceId = " + tm.getDeviceId() + "， softWareVersion = " + tm.getDeviceSoftwareVersion());//String );//String
-//        String imei = "864454030098044";
-//        byte[] value = imei.getBytes();
-//        byte[] param = new byte[16];
-//        System.arraycopy(value, 0, param, 0, value.length);
-//        Log.i("weloop", "param = " + Arrays.toString(param) + ", re connect = " + new String(value));
-//
-//        HashMap<String, CorosConfigEntity> hashMap = new HashMap<>();
-//        CorosConfigEntity corosConfigEntity = new CorosConfigEntity();
-//        corosConfigEntity.setBongState(1);
-//        hashMap.put("123", corosConfigEntity);
-//
-//        hashMap.get("123").setBongState(56);
-//        Log.i("weloop", "bongState = " + hashMap.get("123").getBongState());
+        findViewById(R.id.btnAnnotation).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                parseSimpleClassAnnotation();
+                parseMethodAnnotation();
+                parseConstructAnnotation();
+
+                parseFieldAnnotationn();
+
+                parseFruitInfo();
+            }
+        });
+    }
+
+    private void parseFruitInfo() {
+        Field[] fields = Apple.class.getDeclaredFields();
+        for (Field field : fields) {
+            boolean hasAnnotation = field.isAnnotationPresent(FruitName.class);
+            if (hasAnnotation) {
+                FruitName fruitName = field.getAnnotation(FruitName.class);
+                Log.i("weloop", "apple name = " + fruitName.value());
+            }
+
+            boolean hasColorAnnotation = field.isAnnotationPresent(FruitColor.class);
+            if (hasColorAnnotation) {
+                FruitColor fruitColor = field.getAnnotation(FruitColor.class);
+                Log.i("weloop", "apple color = " + fruitColor.fruitColor());
+            }
+        }
 
     }
+
+
+    public static void parseSimpleClassAnnotation() {
+        try {
+            Class userAnnotation = Class.forName("learnmore.yzx.com.learnmore.simpleannotation.UserAnnotation");
+            Annotation[] annotations = userAnnotation.getAnnotations();
+            for (Annotation annotation : annotations) {
+                TestA testA = (TestA) annotation;
+                Log.i("weloop", "类的 name = " + testA.name() + ", id = " + testA.id() + ", gid = " + testA.gid());
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static void parseMethodAnnotation() {
+        Method[] methods = UserAnnotation.class.getDeclaredMethods();
+        for (Method method : methods) {
+            boolean hasAnnotation = method.isAnnotationPresent(TestA.class);
+            if (hasAnnotation) {
+                TestA testA = method.getAnnotation(TestA.class);
+                Log.i("weloop", "所有普通方法方法" + method.getName() + ", name = " + testA.name() + ",id = " + testA.id() + ", gid = " + testA.gid());
+            }
+        }
+    }
+
+    public static void parseConstructAnnotation() {
+        Constructor[] constructors = UserAnnotation.class.getConstructors();
+        for (Constructor constructor : constructors) {
+            boolean hasAnnotation = constructor.isAnnotationPresent(TestA.class);
+            if (hasAnnotation) {
+                TestA annotation = (TestA) constructor.getAnnotation(TestA.class);
+                Log.i("weloop", "构造方法" + constructor.getName() + ", name = " + annotation.name() + ",id = " + annotation.id() + ", gid = " + annotation.gid());
+            }
+        }
+    }
+
+    public static void parseFieldAnnotationn() {
+        Field[] fields = UserAnnotation.class.getDeclaredFields();
+        for (Field field : fields) {
+            boolean hasAnnotation = field.isAnnotationPresent(TestA.class);
+            if (hasAnnotation) {
+                TestA testA = field.getAnnotation(TestA.class);
+                Log.i("weloop", "参数" + field.getName() + ", name = " + testA.name() + ",id = " + testA.id() + ", gid = " + testA.gid());
+            }
+        }
+    }
+
 
     private void init2Option() {
         Class<Dialog> cls = Dialog.class;
 
         String allContent = "完整类名：" + cls.getName() + "\n";
-        allContent += "所有public类型的属性值 : ";
+        allContent += "所有public类型的属性值 : \n";
         Field[] allPublic = cls.getFields();
         for (Field field : allPublic) {
             allContent += (field.getType().getSimpleName() + " ---> " + field.getName() + ", \n");
@@ -72,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
             allContent += (" 处理后的what值 = " + changeField.getInt("what"));
         } catch (Exception e) {
             e.printStackTrace();
+            allContent += e.getMessage();
         }
 
         allContent += "\n\n\n\n";
@@ -127,7 +197,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void changeDialogContent() {
         try {
-            // mAlert is AlertController,
             Field field = alertDialog.getClass().getDeclaredField("mAlert");
             field.setAccessible(true);
 
@@ -143,20 +212,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private class ButtonHandler extends Handler {
-        private static final int msgDismissDialog = 1;
         private WeakReference<DialogInterface> mDialog;
 
         public ButtonHandler(DialogInterface dialogInterface) {
-            this.mDialog = new WeakReference<DialogInterface>(dialogInterface);
+            this.mDialog = new WeakReference<>(dialogInterface);
         }
 
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
+                default:
                 case DialogInterface.BUTTON_NEGATIVE:
-
+                    Toast.makeText(MainActivity.this, "BUTTON_NEGATIVE", Toast.LENGTH_LONG).show();
                     break;
                 case DialogInterface.BUTTON_POSITIVE:
+                    Toast.makeText(MainActivity.this, "BUTTON_POSITIVE", Toast.LENGTH_LONG).show();
+
                     break;
                 case DialogInterface.BUTTON_NEUTRAL:
                     ((DialogInterface.OnClickListener) msg.obj).onClick(mDialog.get(), msg.what);
